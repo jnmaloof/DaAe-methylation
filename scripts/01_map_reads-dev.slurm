@@ -2,7 +2,7 @@
 #SBATCH --partition=dev # partition to submit to
 #SBATCH --job-name="Minimap-DaAe" # Job name
 #SBATCH --nodes=1 # single node, anything more than 1 will not run
-#SBATCH --ntasks=8 # equivalent to cpus, stick to around 20 max on gc64, or gc128 nodes
+#SBATCH --ntasks=1 # equivalent to cpus, stick to around 20 max on gc64, or gc128 nodes
 #SBATCH --exclusive
 #SBATCH --mem-per-cpu=8000 # in MB, memory pool all cores, default is 2GB per cpu
 #SBATCH --time=0-03:00:00  # expected time of completion in hours, minutes, seconds, default 1-day
@@ -54,11 +54,11 @@ find $fastq_dir2/ | grep -E "(2034|2039).*bam$" >> L121.fofn
 
 ## for DaAe Reads
 
-pbmm2 align $DaAe_Fasta DaAe.fofn DaAe_to_DaAe_dev.bam --preset HIFI --unmapped --sort -j 8
+pbmm2 align $DaAe_Fasta DaAe.fofn DaAe_to_DaAe_dev.bam --preset HIFI --unmapped --sort -j 1
 
 ## For L121
 
-pbmm2 align $DaAe_Fasta L121.fofn L121_to_DaAe_dev.bam --preset HIFI --unmapped --sort -j 8
+pbmm2 align $DaAe_Fasta L121.fofn L121_to_DaAe_dev.bam --preset HIFI --unmapped --sort -j 1
 
   
 # Run stats
