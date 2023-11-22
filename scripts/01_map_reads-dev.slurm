@@ -33,7 +33,7 @@ cd /share/malooflab/Julin/git/DaAe-methylation/input
 
 DaAe_Fasta=/share/malooflab/John/KIAT_Revisions/Assemblies/KIAT_Assemblies/PreRevision_Final/DaAe_20210520.fa
 
-fastq_dir1=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_BrassicaPool_User-HiFiv3_Revio_cell1/
+fastq_dir1=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_BrassicaPool_User-HiFiv3_Revio_cell1/SMRT_LIMA
 
 fastq_dir2=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_BrassicaPool_User-HiFiv3_Revio_cell2/r84066_20231018_212357_1_B01/hifi_reads
 
@@ -41,12 +41,13 @@ fastq_dir2=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_Brass
 
 # not sure why I cant get my regex to work directly with find, but this works...
 
-find $fastq_dir2/ | grep -E "(2036|2037|2038).*bam$" > DaAe.fofn
-#find $fastq_dir2/ | grep -E "(2036|2037|2038).*bam$" >> DaAe.fofn
+find $fastq_dir1/ | grep -E "(2036|2037|2038).*bam$" > DaAe.fofn
+find $fastq_dir2/ | grep -E "(2036|2037|2038).*bam$" >> DaAe.fofn
 
 # L121 Bam files
 
-find $fastq_dir2/ | grep -E "(2034|2039).*bam$" > L121.fofn
+find $fastq_dir1/ | grep -E "(2034|2039).*bam$" > L121.fofn
+find $fastq_dir2/ | grep -E "(2034|2039).*bam$" >> L121.fofn
 
 
 # Run program
