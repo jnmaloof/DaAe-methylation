@@ -19,35 +19,46 @@ start=`date +%s`
 
 ## Load required modules
 
-module load minimap2/2.24
 module load samtools/1.17
+module load anaconda3/23.1.0
 
 ## set up environment
+
+### conda for pbmm2
+source ~/.bashrc
+conda activate /share/malooflab/Packages/Conda_Envs/pacbio-minimap2
+
 
 cd /share/malooflab/Julin/git/DaAe-methylation/input
 
 DaAe_Fasta=/share/malooflab/John/KIAT_Revisions/Assemblies/KIAT_Assemblies/PreRevision_Final/DaAe_20210520.fa
 
-fastq-dir1=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_BrassicaPool_User-HiFiv3_Revio_cell1/Brassica_7plex_cell1_Demux_6545/outputs
+fastq_dir1=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_BrassicaPool_User-HiFiv3_Revio_cell1/
 
-fastq-dir2=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_BrassicaPool_User-HiFiv3_Revio_cell2/Brassica_6plex_cell2_Demux_6558/outputs
+fastq_dir2=/share/rwmstore/Reads_DNA_RWM/PacBio/Brassica/2023_10_27/PB1011_BrassicaPool_User-HiFiv3_Revio_cell2/r84066_20231018_212357_1_B01/hifi_reads
+
+# DaAe bam files
+
+# not sure why I cant get my regex to work directly with find, but this works...
+
+find $fastq_dir2/ | grep -E "(2036|2037|2038).*bam$" > DaAe.fofn
+#find $fastq_dir2/ | grep -E "(2036|2037|2038).*bam$" >> DaAe.fofn
+
+# L121 Bam files
+
+find $fastq_dir2/ | grep -E "(2034|2039).*bam$" > L121.fofn
 
 
 # Run program
 
 ## for DaAe Reads
 
-minimap2 -ax map-pb -t 1 \
-  $DaAe_Fasta \
-  $fastq-dir1/m84066_231012_001601_s4.bc2036--bc2036.hifi_reads.fastq.gz \
-  $fastq-dir1/m84066_231012_001601_s4.bc2037--bc2037.hifi_reads.fastq.gz \
-  $fastq-dir1/m84066_231012_001601_s4.bc2038--bc2038.hifi_reads.fastq.gz \
-  $fastq-dir2/m84066_231018_220419_s2.bc2036--bc2036.hifi_reads.fastq.gz \
-  $fastq-dir2/m84066_231018_220419_s2.bc2037--bc2037.hifi_reads.fastq.gz \
-  $fastq-dir2/m84066_231018_220419_s2.bc2038--bc2038.hifi_reads.fastq.gz \
-  | samtools sort | samtools view -b --threads 1  --write-index  --output DaAe-PacBio-to-DaAe.bam
+pbmm2 align $DaAe_Fasta DaAe.fofn DaAe_to_DaAe.bam --preset HIFI --unmapped --sort -j 1
 
 ## For L121
+
+pbmm2 align $DaAe_Fasta L121.fofn L121_to_DaAe.bam --preset HIFI --unmapped --sort -j 1
+
 
 minimap2 -ax map-pb -t 1 \
   $DaAe_Fasta \
