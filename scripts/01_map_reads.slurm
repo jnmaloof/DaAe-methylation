@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --partition=production # partition to submit to
-#SBATCH --job-name="CRISPR-RD-build" # Job name
+#SBATCH --job-name="Minimap-DaAe" # Job name
 #SBATCH --nodes=1 # single node, anything more than 1 will not run
-#SBATCH --ntasks=48 # equivalent to cpus, stick to around 20 max on gc64, or gc128 nodes
+#SBATCH --ntasks=8 # equivalent to cpus, stick to around 20 max on gc64, or gc128 nodes
 #SBATCH --exclusive
 #SBATCH --mem-per-cpu=4000 # in MB, memory pool all cores, default is 2GB per cpu
-#SBATCH --time=7-01:00:00  # expected time of completion in hours, minutes, seconds, default 1-day
-#SBATCH --output=sb_%A_CRISPR-RD.out # File to which STDOUT will be written
-#SBATCH --error=sb_%A_CRISPR-RD.err # File to which STDERR will be written
+#SBATCH --time=0-04:00:00  # expected time of completion in hours, minutes, seconds, default 1-day
+#SBATCH --output=sb_%A_Minimap-DaAe.out # File to which STDOUT will be written
+#SBATCH --error=sb_%A_Minimap-DaAe.err # File to which STDERR will be written
 #SBATCH --mail-user=jnmaloof@ucdavis.edu
 #SBATCH --mail-type=ALL
 
