@@ -9,6 +9,12 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+library(tidyverse)
+library(genomation)
+```
+
+
 ## Intro
 
 What regions are present in L121 (B. rapa) but missing in DaAe
@@ -48,5 +54,19 @@ cd ~/git/DaAe-methylation/input/deletions
 bedtools coverage -f 0.5 -a ../Brapa_Z1_V2/BrapaZ1_v2_annotation_mRNA.gff -b L121_missing_in_DaAe.bam > L121_missing_in_DaAe.bed
 ```
 
+## summarize
 
+```{r}
+L121_deletions <- read_delim("../input/deletions/L121_missing_in_DaAe.bed",
+                             col_names = FALSE) %>%
+  select(chr=X1, start=X4, end=X5, coverage=X10, bp.count=X11, bp.frac=X13, ID=X9)
+
+
+L121_deletions
+```
+
+```{r}
+L121_deletions %>%
+  filter(bp.frac>0)
+```
 
