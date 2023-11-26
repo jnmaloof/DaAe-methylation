@@ -1,0 +1,52 @@
+---
+title: "04_Analyze_Deletions"
+author: "Julin Maloof"
+date: "2023-11-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Intro
+
+What regions are present in L121 (B. rapa) but missing in DaAe
+
+Strategy: find L121 reads that to B. rapa but didn't map to DaAe
+
+Take the read names from unmapped to DaAe reads and filter the Z1 bam on those read names
+
+## Pull unmapped to DaAe reads
+
+```{bash, eval=FALSE}
+cd ~/git/DaAe-methylation/input/
+
+mkdir deletions
+
+samtools view --require-flags 4 aligned_bams/L121_to_DaAe.bam | cut -f 1 >  deletions/L121_to_DaAe_unmapped.txt
+```
+
+Now filter the L121 to Brapa BAM file to keep the reads that did map to B.rapa but that were unmapped againse DaAe
+```{bash, eval=FALSE}
+samtools view -b --exclude-flags 4 -N deletions/L121_to_DaAe_unmapped.txt aligned_bams/L121_to_Brapa.bam > deletions/L121_missing_in_DaAe.bam
+```
+
+## Find regions
+
+First filter the gff to only keep mRNA records
+```{bash, eval=FALSE}
+cd ~/git/DaAe-methylation/input
+
+grep "mRNA" Brapa_Z1_V2/BrapaZ1_v2_annotation.gff > Brapa_Z1_V2/BrapaZ1_v2_annotation_mRNA.gff
+```
+
+Now use bedtools to calculate coverage for each gene
+```{bash, eval=FALSE}
+cd ~/git/DaAe-methylation/input/deletions
+
+bedtools coverage -f 0.5 -a ../Brapa_Z1_V2/BrapaZ1_v2_annotation_mRNA.gff -b L121_missing_in_DaAe.bam > L121_missing_in_DaAe.bed
+```
+
+
+

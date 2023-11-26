@@ -1,0 +1,8 @@
+[2023-11-23][00:48:37][aligned_bam_to_cpg_scores][INFO] Starting aligned_bam_to_cpg_scores
+[2023-11-23][00:48:37][aligned_bam_to_cpg_scores][INFO] cmdline: aligned_bam_to_cpg_scores --bam aligned_bams/DaAe_to_DaAe.bam --output-prefix cpg_scores/DaAe_to_DaAe_cpg --model /usr/local/bin/pb-CpG-tools-v2.3.2-x86_64-unknown-linux-gnu/models/pileup_calling_model.v1.tflite --threads 15
+[2023-11-23][00:48:37][aligned_bam_to_cpg_scores][INFO] Running on 15 threads
+[2023-11-23][00:48:37][aligned_bam_to_cpg_scores][INFO] Processing alignment file 'aligned_bams/DaAe_to_DaAe.bam'
+[2023-11-23][00:55:25][aligned_bam_to_cpg_scores][INFO] Finished processing alignment files.
+[2023-11-23][00:55:25][aligned_bam_to_cpg_scores][INFO] Writing combined site methylation to bed file: 'cpg_scores/DaAe_to_DaAe_cpg.combined.bed'
+[2023-11-23][00:55:25][aligned_bam_to_cpg_scores][INFO] Writing combined site methylation to bigwig file: 'cpg_scores/DaAe_to_DaAe_cpg.combined.bw'
+[2023-11-23][00:56:01][aligned_bam_to_cpg_scores][INFO] aligned_bam_to_cpg_scores completed. Total Runtime: 00:07:23.722
