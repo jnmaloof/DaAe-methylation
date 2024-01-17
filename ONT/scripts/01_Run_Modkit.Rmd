@@ -1,0 +1,14 @@
+# Run ModKit
+
+[modkit](https://github.com/nanoporetech/modkit) is ONT's toolkit for generating methylation bed files from ONT methylations bam files
+
+I am working on Jetstream
+
+Reads are in `/media/volume/sdb/NewDaAe_2023_2024/ONT/methylation`
+
+## Install Modkit
+
+```{bash, eval=FALSE}
+
+```
+
