@@ -6,9 +6,63 @@ I am working on Jetstream
 
 Reads are in `/media/volume/sdb/NewDaAe_2023_2024/ONT/methylation`
 
+Ruta mapped the reads from each sample to DaAe
+
 ## Install Modkit
 
+Compiled versions are for CentOS...hopefully runs on ubuntu
+
 ```{bash, eval=FALSE}
+
+wget https://github.com/nanoporetech/modkit/releases/download/v0.2.4/modkit_v0.2.4_centos7_x86_64.tar.gz
+tar -xvzf modkit_v0.2.4_centos7_x86_64.tar.gz
+mv dist modkit-dist
+ln -s modkit-dist/modkit ./
+```
+
+
+## index and sort bam files
+
+```{bash, eval=FALSE}
+cd /media/volume/sdc/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023
+
+samtools sort -m 3G --threads 30 -O BAM barcode17_5mc-5hmc.bam > barcode17_5mc-5hmc_sort.bam
+samtools index barcode17_5mc-5hmc_sort.bam
+
+samtools sort -m 3G --threads 30 -O BAM barcode01_5mc-5hmc.bam > barcode01_5mc-5hmc_sort.bam
+samtools index barcode01_5mc-5hmc_sort.bam
+
+samtools sort -m 3G --threads 30 -O BAM barcode09_5mc-5hmc.bam > barcode09_5mc-5hmc_sort.bam
+samtools index barcode09_5mc-5hmc_sort.bam
+```
+
+
+## Run it
+
+```{bash, eval=FALSE}
+cd /media/volume/sdb/DaAe-methylation/ONT/output
+
+input_dir=/media/volume/sdc/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023
+ref=/media/volume/sdb/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa
+
+#DaAe to DaAe
+modkit pileup --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe.bed
+
+modkit pileup --log-filepath DaAe-trad.log --threads 28 --only-tabs --traditional --ref $ref $input_dir/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe.bed
+
+#L121 to DaAe
+
+modkit pileup --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe.bed
+
+modkit pileup --log-filepath DaAe-trad.log --threads 28 --only-tabs --traditional --ref $ref $input_dir/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe.bed
+
+#T26 to DaAe
+
+modkit pileup --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe.bed
+
+modkit pileup --log-filepath DaAe-trad.log --threads 28 --only-tabs --traditional --ref $ref $input_dir/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe.bed
+
+
 
 ```
 
