@@ -39,6 +39,9 @@ samtools index barcode09_5mc-5hmc_sort.bam
 
 ## Run it
 
+run in full mode and "Traditional" mode which only looks at CpG and combines info from both strands
+
+
 ```{bash, eval=FALSE}
 cd /media/volume/sdb/DaAe-methylation/ONT/output
 
@@ -46,21 +49,21 @@ input_dir=/media/volume/sdc/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmor
 ref=/media/volume/sdb/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa
 
 #DaAe to DaAe
-modkit pileup --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath DaAe.log --threads 15 --only-tabs $input_dir/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe.bed
 
-modkit pileup --log-filepath DaAe-trad.log --threads 28 --only-tabs --traditional --ref $ref $input_dir/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath DaAe-trad.log --threads 15 --only-tabs --preset traditional --ref $ref $input_dir/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe.bed
 
 #L121 to DaAe
 
-modkit pileup --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe.bed
 
-modkit pileup --log-filepath DaAe-trad.log --threads 28 --only-tabs --traditional --ref $ref $input_dir/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath DaAe-trad.log --threads 28 --only-tabs --preset traditional --ref $ref $input_dir/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe.bed
 
 #T26 to DaAe
 
-modkit pileup --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath DaAe.log --threads 28 --only-tabs $input_dir/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe.bed
 
-modkit pileup --log-filepath DaAe-trad.log --threads 28 --only-tabs --traditional --ref $ref $input_dir/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath DaAe-trad.log --threads 28 --only-tabs --preset traditional --ref $ref $input_dir/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe.bed
 
 
 
