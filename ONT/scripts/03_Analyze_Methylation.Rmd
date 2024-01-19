@@ -190,12 +190,12 @@ means <- tibble(L121=L121mean, DaAe=DaAemean, T26=T26mean)
 ```{r}
 p1 <- means %>%
   ggplot(aes(x=DaAe, y=L121)) +
-  geom_point(alpha=.2) +
+  geom_point(alpha=.15) +
   coord_equal()
 
 p2 <- means %>%
   ggplot(aes(x=DaAe, y=T26)) +
-  geom_point(alpha=.2) +
+  geom_point(alpha=.15) +
   coord_equal()
 
 cowplot::plot_grid(p1, p2 )
@@ -205,15 +205,15 @@ cowplot::plot_grid(p1, p2 )
 p1 <- 
 means %>%
   ggplot(aes(x=DaAe, y=L121)) +
-  geom_hex(bins=25) +
+  geom_hex(bins=20) +
   coord_equal() +
-  scale_fill_gradient(limits=c(NA, 60), high = "lightblue1", oob=scales::squish, guide = FALSE)
+  scale_fill_gradient(limits=c(NA, 200), high = "lightblue1", oob=scales::squish, guide = FALSE, trans="log10")
 
 p2 <- means %>%
   ggplot(aes(x=DaAe, y=T26)) +
-  geom_hex(bins=25) +
+  geom_hex(bins=20) +
   coord_equal() +
-  scale_fill_gradient(limits=c(NA, 60), high = "lightblue1", oob=scales::squish)
+  scale_fill_gradient(limits=c(NA, 200), high = "lightblue1", oob=scales::squish, trans="log10")
 
 cowplot::plot_grid(p1, p2, rel_widths = c(4,4.9) )
 ```
