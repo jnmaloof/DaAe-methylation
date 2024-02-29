@@ -1,5 +1,5 @@
 ---
-title: "03 Analyze Methylation"
+title: "03 Analyze Methylation CpG"
 author: "Julin Maloof"
 date: "2023-11-24"
 output: html_document
