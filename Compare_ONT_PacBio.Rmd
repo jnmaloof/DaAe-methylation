@@ -1,0 +1,176 @@
+---
+title: "Compare_Methylation"
+output: html_document
+date: "2024-04-16"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(tidyverse)
+library(genomation)
+library(GenomicRanges)
+library(plyranges)
+```
+
+## import HiFi
+
+chromromes to keep (main chromosomes)
+```{r}
+chrkeep <- c(str_c("chrA", str_pad(1:10, 2, pad = "0")),
+             str_c("chrC0", 1:9))
+chrkeep
+```
+
+
+Get DaAe lengths and create GRanges object
+```{r}
+DaAeLengths.df <- read_delim("~/Sequences/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa.fai", col_names = c("chr", "length") ) %>%
+  select(chr, length) %>% 
+  filter(chr %in% chrkeep)
+
+DaAeLengths.vec <- DaAeLengths.df %>% pull(length) %>% set_names(DaAeLengths.df$chr)
+
+DaAeLengths.gr <-  GRanges(seqnames = str_c(DaAeLengths.df$chr, ":1-", DaAeLengths.df$length), seqlengths = DaAeLengths.vec)
+
+DaAeLengths.gr
+```
+
+Get DaAe gff
+```{r}
+gff <- gffToGRanges("~/Sequences/ref_genomes/B_napus/John_DaAe/DaAe_20210520.gff3", filter = "mRNA")
+gff <- gff[seqnames(gff) %in% chrkeep] 
+seqlevels(gff) <- seqlevelsInUse(gff)
+
+seqlengths(gff) <- DaAeLengths.vec
+```
+
+Create a TSS Granges.
+```{r}
+TSS <- promoters(gff, upstream=1000, downstream = 1000)
+TSS
+```
+
+
+```{r}
+DaAeHiFi <- readGeneric("HiFi/input/cpg_scores/DaAe_to_DaAe_cpg.combined.bed",
+                    meta.cols=list(DaAe_HiFi_score=4,
+                                   DaAe__HiFi_coverage=6))
+
+DaAeHiFi <- DaAeHiFi[seqnames(DaAeHiFi) %in% chrkeep] 
+seqlevels(DaAeHiFi) <- seqlevelsInUse(DaAeHiFi)
+DaAeHiFi
+```
+
+## Get ONT DaAe
+
+```{r}
+DaAeONT <- readGeneric("ONT/output/DaAe_ONT_to_DaAe_trad.bed.gz",
+                    meta.cols=list(DaAe_ONT_score=11,
+                                   DaAe__ONT_coverage=10))
+
+DaAeONT <- DaAeONT[seqnames(DaAeONT) %in% chrkeep] 
+seqlevels(DaAeONT) <- seqlevelsInUse(DaAeONT)
+DaAeONT
+```
+
+## Combine them
+
+
+```{r, warning=FALSE}
+DaAe_HiFi_ONT <- join_overlap_intersect(DaAeHiFi, DaAeONT)
+```
+
+```{r}
+DaAe_HiFi_ONT
+```
+
+```{r}
+DaAe_HiFi_ONT %>% summarize(HiFi_score = mean(DaAe_HiFi_score), ONT_score = mean(DaAe_ONT_score))
+``` 
+
+
+```{r}
+
+smHiFi <- DaAe_HiFi_ONT %>% 
+  mcolAsRleList("DaAe_HiFi_score") %>%
+  ScoreMatrix(windows = TSS, strand.aware = TRUE)
+
+smONT <- DaAe_HiFi_ONT %>% 
+  mcolAsRleList("DaAe_ONT_score") %>%
+  ScoreMatrix(windows = TSS, strand.aware = TRUE)
+```
+
+
+```{r}
+plotMeta(smHiFi, xcoords = -999:1000)
+```
+
+```{r}
+plotMeta(smONT, xcoords = -999:1000)
+```
+
+A ggplot version of these plots, combined
+```{r}
+HiFi_DaAe.df <- as.data.frame(smHiFi) %>% 
+  rownames_to_column(var = "gene") %>%
+  pivot_longer(cols = -gene, names_to = "position", names_prefix = "V", values_to = "HiFi", values_drop_na = TRUE) 
+
+DaAe_HiFi_ONT.df <- as.data.frame(smONT)  %>% 
+  rownames_to_column(var = "gene") %>%
+  pivot_longer(-gene, names_to = "position", names_prefix = "V", values_to = "ONT", values_drop_na = TRUE) %>%
+  full_join(HiFi_DaAe.df) %>%
+  mutate(position = as.numeric(position) - 1000)
+
+head(DaAe_HiFi_ONT.df, 1000)
+```
+
+
+```{r}
+DaAe_HiFi_ONT.df %>%
+  pivot_longer(c(HiFi, ONT), values_to = "CpG", names_to = "ID") %>%
+  ggplot(aes(x=position, y=CpG, color = ID)) +
+  geom_smooth()
+```
+
+
+
+```{r fig.asp=1}
+HiFimean <- rowMeans(smHiFi[,500:1500], na.rm = TRUE)
+ONTmean <- rowMeans(smONT[,500:1500], na.rm = TRUE)
+means <- tibble(HiFi=HiFimean, ONT=ONTmean)
+```
+
+```{r, fig.asp=1}
+means %>%
+  ggplot(aes(x=HiFi, y=ONT)) +
+  geom_point(alpha=.1)
+```
+
+```{r}
+cor.test(means$HiFi, means$ONT)
+```
+## Per base
+```{r}
+cor(DaAe_HiFi_ONT$DaAe_HiFi_score, DaAe_HiFi_ONT$DaAe_ONT_score)
+```
+
+```{r}
+DaAe_HiFi_ONT %>% mcols() %>%
+  as_tibble() %>%
+  slice_sample(n=100000) %>%
+    ggplot(aes(x=DaAe_HiFi_score, y=DaAe_ONT_score)) +
+  coord_equal() +
+geom_point(alpha=.05)
+```
+
+```{r}
+DaAe_HiFi_ONT %>% mcols() %>%
+   as_tibble() %>%
+     ggplot(aes(x=DaAe_HiFi_score, y=DaAe_ONT_score)) +
+   geom_hex() +
+   coord_equal() +
+   scale_fill_gradient(high = "lightblue1", trans="log10")
+```
+

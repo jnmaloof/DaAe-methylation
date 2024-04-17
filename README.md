@@ -1,7 +1,7 @@
 # DaAe-methylation
 PacBio and ONT methylation analysis of DaAe and its parents
 
-## PacBio barcodes
+## ONT barcodes
 
 Sample L121 (B. rapa) = barcode01, yield 33 Gb
 
