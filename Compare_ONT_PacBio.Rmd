@@ -174,3 +174,24 @@ DaAe_HiFi_ONT %>% mcols() %>%
    scale_fill_gradient(high = "lightblue1", trans="log10")
 ```
 
+## bases in genes only:
+
+```{r}
+
+DaAe_HiFi_ONT_mRNA <- join_overlap_intersect(DaAe_HiFi_ONT, gff[gff$type=="mRNA"])
+```
+
+```{r}
+cor(DaAe_HiFi_ONT_mRNA$DaAe_HiFi_score, DaAe_HiFi_ONT_mRNA$DaAe_ONT_score)
+```
+
+```{r}
+DaAe_HiFi_ONT_mRNA %>% mcols() %>%
+  as_tibble() %>%
+  slice_sample(n=100000) %>%
+    ggplot(aes(x=DaAe_HiFi_score, y=DaAe_ONT_score)) +
+  coord_equal() +
+geom_point(alpha=.05)
+```
+
+
