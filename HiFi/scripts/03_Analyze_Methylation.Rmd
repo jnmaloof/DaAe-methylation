@@ -30,7 +30,7 @@ library(plyranges)
 
 ## import data
 
-chromromse to keep (main chromosomes)
+chromromes to keep (main chromosomes)
 ```{r}
 chrkeep <- c(str_c("chrA", str_pad(1:10, 2, pad = "0")),
              str_c("chrC0", 1:9))
