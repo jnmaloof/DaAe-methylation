@@ -219,7 +219,7 @@ cowplot::plot_grid(p1, p2, rel_widths = c(4,4.9) )
 ```
 
 ```{r}
-means %>%
+means %>% 
   summarize(higher_in_DaAe_vs_L121=sum(DaAe > 75 & L121 <= 25, na.rm = TRUE),
             higher_in_L121_vs_DaAe=sum(DaAe <= 25 & L121 > 75, na.rm = TRUE),
             total=dplyr::n(),

@@ -37,9 +37,8 @@ TSS
 ```
 
 ```{r}
-L121 <- readGeneric("~/data/methylation/ONT/output/L121_ONT_to_DaAe.bed.gz"
-                    "~/data/methylation/ONT/output/L121_ONT_to_DaAe_chh.bed",
-                    meta.cols=list(L121_score=5,
+L121 <- readGeneric("../output/L121_ONT_to_DaAe_2024-27-04chh.bed.gz",
+                    meta.cols=list(L121_score=11,
                                    L121_coverage=10))
 
 L121 <- L121[seqnames(L121) %in% chrkeep] 
@@ -48,9 +47,8 @@ L121
 ```
 
 ```{r}
-T26 <- readGeneric("~/data/methylation/ONT/output/T26_ONT_to_DaAe.bed.gz"
-              "~/data/methylation/ONT/output/T26_ONT_to_DaAe_chh.bed",
-                    meta.cols=list(T26_score=5,
+T26 <- readGeneric("../output/T26_ONT_to_DaAe_2024-27-04chh.bed.gz",
+                    meta.cols=list(T26_score=11,
                                    T26_coverage=10))
 
 T26 <- T26[seqnames(T26) %in% chrkeep] 
@@ -60,9 +58,8 @@ T26
 ```
 
 ```{r}
-DaAe <- readGeneric("~/data/methylation/ONT/output/DaAe_ONT_to_DaAe.bed"
-                    "~/data/methylation/ONT/output/L121_ONT_to_DaAe_chh.bed",
-                    meta.cols=list(DaAe_score=5,
+DaAe <- readGeneric("../output/DaAe_ONT_to_DaAe_2024-27-04chh.bed"   ,
+                    meta.cols=list(DaAe_score=11,
                                    DaAe_coverage=10))
 
 DaAe <- DaAe[seqnames(DaAe) %in% chrkeep] 
@@ -78,6 +75,12 @@ All <- join_overlap_intersect(L121, DaAe) %>%
 ```{r}
 All
 ```
+```{r}
+All %>% summarize(L121_score = mean(L121_score), 
+                  T26_score = mean(T26_score),
+                  DaAe_score = mean(DaAe_score))
+``` 
+
 
 ```{r}
 smL121 <- All %>% 
@@ -189,30 +192,28 @@ means %>%
 
 
 # modkit
-```{r}
+```{bash}
+#note: "sdc" is now "julin-analyses"
+# "sdb" is now "julin_DaAe"
+
+
+
 cd /media/volume/sdc/DaAe-methylation/ONT/output
 
 input_dir=/media/volume/sdb/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023
-ref=/media/volume/sdc/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa
+ref=/media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa
 
 # DaAe to DaAe
-modkit pileup --include-bed ../input/include.bed --log-filepath DaAe.log --threads 15 --only-tabs $input_dir/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe.bed
---motif CH 0 \
---ref $ref \
---include -bed path/to/my_chh.bed > DaAe_ONT_to_DaAe_chh.bed
+
+modkit pileup --include-bed ../input/include.bed --log-filepath DaAe-2024-24-04.log --threads 7 --only-tabs "/media/volume/julin_DaAe/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023/barcode17_5mc-5hmc_sort.bam" DaAe_ONT_to_DaAe_2024chh.bed --motif CHH 0 --ref "/media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa"  
+
 
 # L121 to DaAe
-modkit pileup --include-bed ../input/include.bed --log-filepath L121.log --threads 15 --only-tabs $input_dir/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe.bed
---motif CH 0 \
---ref $ref \
---include -bed path/to/my_chh.bed > L121_ONT_to_DaAe_chh.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath L121-2024-27-04.log --threads 7 --only-tabs "/media/volume/julin_DaAe/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023/barcode17_5mc-5hmc_sort.bam" L121_ONT_to_DaAe_2024-27-04chh.bed --motif CHH 0 --ref "/media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa"  
 
 
 # T26 to DaAe
-modkit pileup --include-bed ../input/include.bed --log-filepath T26.log --threads 15 --only-tabs $input_dir/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe.bed
---motif CH 0 \
---ref $ref \
---include -bed path/to/my_chh.bed > T26_ONT_to_DaAe_chh.bed
+modkit pileup --include-bed ../input/include.bed --log-filepath T26-2024-27-04.log --threads 7 --only-tabs "/media/volume/julin_DaAe/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023/barcode17_5mc-5hmc_sort.bam" --motif CHH 0 --ref "/media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa"  
 
 ```
 
