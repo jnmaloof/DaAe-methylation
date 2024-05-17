@@ -1,0 +1,49 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-03-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Goal 
+find DNA methylation at enhancer regions or full length coding region (central exons(RNA that codes for protiens)) which methylation inhibits transcription elongation or 
+
+RdDM target regions (located evolutionary young transposons and short transposons and at the edges of long transposons)
+
+Strategy: 
+
+1. import data
+2. look for siRNAs
+3. look for repetative sequences  
+4. look to TEs, transposable elements 
+
+```{r}
+library(tidyverse)
+library(genomation)
+library(GenomicRanges)
+library(plyranges)
+library(TEffectR)
+```
+
+# import data 
+```{r}
+DaAeTE <- TEffectR::rm_format(filepath = "../output/DaAe_ONT_to_DaAe_trad.bed.gz")
+```
+```{r}
+DaAeTE <- TEffectR::rm_format(filepath ="~/Sequences/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa.fai")
+
+
+```
+
+```{r}
+
+
+```
+
+
+```{r}
+
+```
+
