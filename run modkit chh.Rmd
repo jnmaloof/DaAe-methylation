@@ -1,0 +1,30 @@
+
+# modkit
+
+#note: "sdc" is now "julin-analyses"
+# "sdb" is now "julin_DaAe"
+
+
+
+cd /media/volume/sdc/DaAe-methylation/ONT/output
+
+input_dir=/media/volume/sdb/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023
+ref=/media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa 
+
+```{R}
+# DaAe to DaAe
+
+- modkit pileup --include-bed ../input/include.bed --log-filepath DaAe-2024-15-05.log --threads 7 --only-tabs --motif CHH 0 --ref /media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa /media/volume/julin_DaAe/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023/barcode17_5mc-5hmc_sort.bam DaAe_ONT_to_DaAe_2024-15-05chh.bed
+
+# L121 to DaAe
+
+modkit pileup --include-bed ../input/include.bed --log-filepath L121-2024-15-05.log --threads 7 --only-tabs --motif CHH 0 --ref /media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa /media/volume/julin_DaAe/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023/barcode01_5mc-5hmc_sort.bam L121_ONT_to_DaAe_2024-15-05chh.bed
+
+# T26 to DaAe
+ 
+modkit pileup --include-bed ../input/include.bed --log-filepath T26-2024-15-05.log --threads 7 --only-tabs --motif CHH 0 --ref /media/volume/julin-analyses/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa /media/volume/julin_DaAe/NewDaAe_2023_2024/ONT/methylation/PROM0168_Michelmore_NB-Pool_12072023/barcode09_5mc-5hmc_sort.bam T26_ONT_to_DaAe_2024-15-05chh.bed
+```
+
+
+
+
