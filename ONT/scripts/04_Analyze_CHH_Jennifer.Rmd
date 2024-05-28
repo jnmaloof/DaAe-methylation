@@ -35,28 +35,21 @@ seqlengths(gff) <- DaAeLengths.vec
 TSS <- promoters(gff, upstream=1000, downstream = 1000)
 TSS
 ```
-```{r}
-L121A <- readGeneric( "../output/L121A01.gz",
-                    meta.cols=list(L121A_score=11,
-                                   L121A_coverage=10))
 
-L121A <- L121A[seqnames(L121A) %in% chrkeep] 
-seqlevels(L121A) <- seqlevelsInUse(L121A)
-L121A
+```{r}
+L121 <- readGeneric("../output/L121_ONT_to_DaAe_5mc_chh.bed.gz",
+                    meta.cols=list(L121_score=11,
+                                   L121_coverage=10))
+
+L121 <- L121[seqnames(L121) %in% chrkeep] 
+seqlevels(L121) <- seqlevelsInUse(L121)
+
+L121
 ```
 
-```{r}
-L121C <- readGeneric( "../output/L121Cchr.gz",
-                    meta.cols=list(L121C_score=11,
-                                   L121C_coverage=10))
-
-L121C <- L121C[seqnames(L121) %in% chrkeep] 
-seqlevels(L121C) <- seqlevelsInUse(L121)
-L121C
-```
 
 ```{r}
-T26 <- readGeneric("../output/T26_ONT_to_DaAe_2024-15-05chh.bed.gz",
+T26 <- readGeneric("../output/T26_ONT_to_DaAe_5mc_chh.bed.gz",
                     meta.cols=list(T26_score=11,
                                    T26_coverage=10))
 
@@ -67,7 +60,7 @@ T26
 ```
 
 ```{r}
-DaAe <- readGeneric("../output/DaAe_ONT_to_DaAe_2024chh.bed.gz"   ,
+DaAe <- readGeneric("../output/DaAe_ONT_to_DaAe_5mc_chh.bed.gz",
                     meta.cols=list(DaAe_score=11,
                                    DaAe_coverage=10))
 
