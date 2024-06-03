@@ -47,6 +47,36 @@ seqlevels(L121) <- seqlevelsInUse(L121)
 L121
 ```
 
+# disjoin ranges and add metadata to grange
+```{r}
+L121DJR <- disjoin(L121) 
+
+mcols(L121DJR) <- elementMetadata(L121) 
+L121DJR
+
+```
+#checking lengths
+```{r}
+length(L121DJR)
+
+nrow(elementMetadata(L121))
+```
+
+#extend metadata to match grange
+```{r}
+L121meta <- (elementMetadata(L121))
+
+L121extended_meta <- L121meta[rep(seq_len(nrow(L121meta)), length.out = length(L121DJR)), ]
+
+#combine metadata to grange
+mcols(L121DJR) <- L121extended_meta
+
+L121DJR
+
+```
+
+
+
 
 ```{r}
 T26 <- readGeneric("../output/T26_ONT_to_DaAe_5mc_chh.bed.gz",
@@ -60,6 +90,33 @@ T26
 ```
 
 ```{r}
+T26DJR <- disjoin(T26) 
+
+mcols(T26DJR) <- elementMetadata(T26) 
+T26DJR
+
+```
+
+```{r}
+length(T26DJR)
+
+nrow(elementMetadata(T26))
+```
+
+```{r}
+T26meta <- (elementMetadata(T26))
+
+T26extended_meta <- T26meta[rep(seq_len(nrow(T26meta)), length.out = length(T26DJR)), ]
+
+#combine metadata to grange
+mcols(T26DJR) <- T26extended_meta
+
+T26DJR
+
+```
+
+
+```{r}
 DaAe <- readGeneric("../output/DaAe_ONT_to_DaAe_5mc_chh.bed.gz",
                     meta.cols=list(DaAe_score=11,
                                    DaAe_coverage=10))
@@ -70,13 +127,38 @@ DaAe
 ```
 
 ```{r}
-All <- join_overlap_intersect(L121, DaAe) %>%
-  join_overlap_intersect(T26)
+DaAeDJR <- disjoin(DaAe) 
+
+mcols(DaAeDJR) <- elementMetadata(DaAe) 
+DaAeDJR
+
 ```
 
 ```{r}
-All
+length(DaAeDJR)
+
+nrow(elementMetadata(DaAe))
 ```
+
+```{r}
+DaAemeta <- (elementMetadata(DaAe))
+
+extended_meta <- DaAemeta[rep(seq_len(nrow(DaAemeta)), length.out = length(DaAeDJR)), ]
+
+#combine metadata to grange
+mcols(DaAeDJR) <- DaAeextended_meta
+
+DaAeDJR
+
+```
+
+
+```{r}
+All <- join_overlap_intersect(L121DJR, DaAeDJR) %>%
+  join_overlap_intersect(T26DJR)
+```
+
+
 ```{r}
 All %>% summarize(L121_score = mean(L121_score), 
                   T26_score = mean(T26_score),
@@ -132,7 +214,7 @@ head(All.df, 1000)
 ```{r}
 All.df %>%
   pivot_longer(c(L121, T26, DaAe), values_to = "CHH", names_to = "ID") %>%
-  ggplot(aes(x=position, y=CpG, color = ID)) +
+  ggplot(aes(x=position, y=CHH, color = ID)) +
   geom_smooth() +
   scale_color_viridis_d()
 ```
