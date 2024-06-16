@@ -47,32 +47,9 @@ seqlevels(L121) <- seqlevelsInUse(L121)
 L121
 ```
 
-# disjoin ranges and add metadata to grange
 ```{r}
-L121DJR <- disjoin(L121) 
-
-mcols(L121DJR) <- elementMetadata(L121) 
-L121DJR
-
-```
-#checking lengths
-```{r}
-length(L121DJR)
-
-nrow(elementMetadata(L121))
-```
-
-#extend metadata to match grange
-```{r}
-L121meta <- (elementMetadata(L121))
-
-L121extended_meta <- L121meta[rep(seq_len(nrow(L121meta)), length.out = length(L121DJR)), ]
-
-#combine metadata to grange
-mcols(L121DJR) <- L121extended_meta
-
-L121DJR
-
+L121re <-resize(L121, width(L121) - 1, fix="start")
+L121re
 ```
 
 
@@ -90,29 +67,8 @@ T26
 ```
 
 ```{r}
-T26DJR <- disjoin(T26) 
-
-mcols(T26DJR) <- elementMetadata(T26) 
-T26DJR
-
-```
-
-```{r}
-length(T26DJR)
-
-nrow(elementMetadata(T26))
-```
-
-```{r}
-T26meta <- (elementMetadata(T26))
-
-T26extended_meta <- T26meta[rep(seq_len(nrow(T26meta)), length.out = length(T26DJR)), ]
-
-#combine metadata to grange
-mcols(T26DJR) <- T26extended_meta
-
-T26DJR
-
+T26re <-resize(T26, width(T26) - 1, fix="start")
+T26re
 ```
 
 
@@ -127,35 +83,19 @@ DaAe
 ```
 
 ```{r}
-DaAeDJR <- disjoin(DaAe) 
-
-mcols(DaAeDJR) <- elementMetadata(DaAe) 
-DaAeDJR
-
-```
-
-```{r}
-length(DaAeDJR)
-
-nrow(elementMetadata(DaAe))
-```
-
-```{r}
-DaAemeta <- (elementMetadata(DaAe))
-
-extended_meta <- DaAemeta[rep(seq_len(nrow(DaAemeta)), length.out = length(DaAeDJR)), ]
-
-#combine metadata to grange
-mcols(DaAeDJR) <- DaAeextended_meta
-
-DaAeDJR
-
+DaAere <-resize(DaAe, width(DaAe) - 1, fix="start")
+DaAere
 ```
 
 
+
 ```{r}
-All <- join_overlap_intersect(L121DJR, DaAeDJR) %>%
-  join_overlap_intersect(T26DJR)
+All <- join_overlap_intersect(L121re, DaAere) %>%
+  join_overlap_intersect(T26re)
+```
+
+```{r}
+All
 ```
 
 
