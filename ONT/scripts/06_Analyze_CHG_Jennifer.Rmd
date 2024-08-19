@@ -1,0 +1,202 @@
+```{r}
+library(tidyverse)
+library(genomation)
+library(GenomicRanges)
+library(plyranges)
+```
+
+```{r}
+chrkeep <- c(str_c("chrA", str_pad(1:10, 2, pad = "0")),
+             str_c("chrC0", 1:9))
+chrkeep
+```
+
+```{r}
+DaAeLengths.df <- read_delim("~/Sequences/ref_genomes/B_napus/John_DaAe/DaAe_20210520.fa.fai", col_names = c("chr", "length") ) %>%
+  select(chr, length) %>% 
+  filter(chr %in% chrkeep)
+
+DaAeLengths.vec <- DaAeLengths.df %>% pull(length) %>% set_names(DaAeLengths.df$chr)
+
+DaAeLengths.gr <-  GRanges(seqnames = str_c(DaAeLengths.df$chr, ":1-", DaAeLengths.df$length), seqlengths = DaAeLengths.vec)
+
+DaAeLengths.gr
+```
+
+```{r}
+gff <- gffToGRanges("~/Sequences/ref_genomes/B_napus/John_DaAe/DaAe_20210520.gff3", filter = "mRNA")
+gff <- gff[seqnames(gff) %in% chrkeep] 
+seqlevels(gff) <- seqlevelsInUse(gff)
+
+seqlengths(gff) <- DaAeLengths.vec
+```
+
+
+
+```{r}
+TSS <- promoters(gff, upstream=1000, downstream = 1000)
+TSS
+```
+
+
+```{r}
+L121 <- readGeneric("../output/L121_ONT_to_DaAe_filtered1.bed.gz",
+                    meta.cols=list(L121_score=11,
+                                   L121_coverage=10))
+
+L121 <- L121[seqnames(L121) %in% chrkeep] 
+seqlevels(L121) <- seqlevelsInUse(L121)
+
+L121
+```
+
+```{r}
+T26 <- readGeneric("../output/T26_ONT_to_DaAe_filtered.bed.gz",
+                    meta.cols=list(T26_score=11,
+                                   T26_coverage=10))
+
+T26 <- T26[seqnames(T26) %in% chrkeep] 
+seqlevels(T26) <- seqlevelsInUse(T26)
+T26
+```
+
+```{r}
+DaAe <- readGeneric("../output/DaAe_ONT_to_DaAe_filtered.bed.gz",
+                    meta.cols=list(DaAe_score=11,
+                                   DaAe_coverage=10))
+
+DaAe <- DaAe[seqnames(DaAe) %in% chrkeep] 
+seqlevels(DaAe) <- seqlevelsInUse(DaAe)
+DaAe
+```
+
+```{r}
+All <- join_overlap_intersect(L121, DaAe) %>%
+  join_overlap_intersect(T26)
+
+All
+```
+
+```{r}
+All %>% summarize(L121_score = mean(L121_score), 
+                  T26_score = mean(T26_score),
+                  DaAe_score = mean(DaAe_score))
+```
+
+```{r}
+smL121 <- All %>% 
+  mcolAsRleList("L121_score") %>%
+  ScoreMatrix(windows = TSS, strand.aware = TRUE)
+
+smT26 <- All %>% 
+  mcolAsRleList("T26_score") %>%
+  ScoreMatrix(windows = TSS, strand.aware = TRUE)
+
+smDaAe <- All %>% 
+  mcolAsRleList("DaAe_score") %>%
+  ScoreMatrix(windows = TSS, strand.aware = TRUE)
+```
+
+```{r}
+plotMeta(smL121, xcoords = -999:1000)
+```
+
+```{r}
+plotMeta(smT26, xcoords = -999:1000)
+```
+
+```{r}
+plotMeta(smDaAe, xcoords = -999:1000)
+```
+
+
+```{r}
+All.df <- as.data.frame(smDaAe) %>% 
+  rownames_to_column(var = "gene") %>%
+  pivot_longer(cols = -gene, names_to = "position", names_prefix = "V", values_to = "DaAe", values_drop_na = TRUE) 
+
+All.df <- as.data.frame(smL121)  %>% 
+  rownames_to_column(var = "gene") %>%
+  pivot_longer(-gene, names_to = "position", names_prefix = "V", values_to = "L121", values_drop_na = TRUE) %>%
+  full_join(All.df)
+
+All.df <- as.data.frame(smT26)  %>% 
+  rownames_to_column(var = "gene") %>%
+  pivot_longer(-gene, names_to = "position", names_prefix = "V", values_to = "T26", values_drop_na = TRUE) %>%
+  full_join(All.df) %>%
+  mutate(position = as.numeric(position) - 1000)
+
+head(All.df, 1000)
+```
+
+
+```{r}
+All.df %>%
+  pivot_longer(c(L121, T26, DaAe), values_to = "CHG", names_to = "ID") %>%
+  ggplot(aes(x=position, y=CHG, color = ID)) +
+  geom_smooth() +
+  scale_color_viridis_d()
+```
+
+
+```{r}
+L121mean <- rowMeans(smL121[,500:1500], na.rm = TRUE)
+DaAemean <- rowMeans(smDaAe[,500:1500], na.rm = TRUE)
+T26mean <- rowMeans(smT26[,500:1500], na.rm = TRUE)
+
+means <- tibble(L121=L121mean, DaAe=DaAemean, T26=T26mean)
+```
+
+
+```{r}
+p1 <- means %>%
+  ggplot(aes(x=DaAe, y=L121)) +
+  geom_point(alpha=.15) +
+  coord_equal()
+
+p2 <- means %>%
+  ggplot(aes(x=DaAe, y=T26)) +
+  geom_point(alpha=.15) +
+  coord_equal()
+
+cowplot::plot_grid(p1, p2 )
+```
+
+
+```{r}
+p1 <- 
+means %>%
+  ggplot(aes(x=DaAe, y=L121)) +
+  geom_hex(bins=20) +
+  coord_equal() +
+  scale_fill_gradient(limits=c(NA, 200), high = "lightblue1", oob=scales::squish, guide = FALSE, trans="log10")
+
+p2 <- means %>%
+  ggplot(aes(x=DaAe, y=T26)) +
+  geom_hex(bins=20) +
+  coord_equal() +
+  scale_fill_gradient(limits=c(NA, 200), high = "lightblue1", oob=scales::squish, trans="log10")
+
+cowplot::plot_grid(p1, p2, rel_widths = c(4,4.9) )
+```
+
+```{r}
+ means %>%
+  summarize(higher_in_DaAe_vs_L121=sum(DaAe > 75 & L121 <= 25, na.rm = TRUE),
+            higher_in_L121_vs_DaAe=sum(DaAe <= 25 & L121 > 75, na.rm = TRUE),
+            total=dplyr::n(),
+            total_with_data=sum(!is.na(DaAe)))
+```
+
+```{r}
+means %>%
+  summarize(higher_in_DaAe_vs_T26=sum(DaAe > 75 & T26 <= 25, na.rm = TRUE),
+            higher_in_T26_vs_DaAe=sum(DaAe <= 25 & T26 > 75, na.rm = TRUE),
+            total=dplyr::n(),
+            total_with_data=sum(!is.na(DaAe)))
+```
+
+
+
+
+
